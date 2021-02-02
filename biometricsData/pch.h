@@ -12,7 +12,7 @@
 
 extern "C"
 {
-	__declspec(dllexport) long get_data(int ch, int num, int rate, short* data);
+	__declspec(dllexport) long get_data(int ch, int num, int rate, short* data, double& stamp);
 	__declspec(dllexport) void bio_usleep(int us);
 }
 

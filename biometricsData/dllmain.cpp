@@ -2,6 +2,7 @@
 #include "pch.h"
 #include <conio.h>
 #include <windows.h>
+#include <chrono>
 
 #import "C:\\Program Files (x86)\\Biometrics Ltd\\DataLINK\\OnLineInterface.dll" no_namespace
 IOnLine* pOnline;	// Declare a global pointer to the interface class instance
@@ -32,7 +33,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 }
 
 
-long get_data(int ch, int num, int rate, short *data)
+long get_data(int ch, int num, int rate, short *data, double &stamp)
 {
     long sampleNum;
     int sizems = int(num * 1000.0 / (float)rate);
@@ -41,6 +42,9 @@ long get_data(int ch, int num, int rate, short *data)
     if ((pOnline->OnLineGetData(ch, sizems, &pSafeArray, &sampleNum) == ONLINE_OK) &&
         (sampleNum > 0))
     {
+        std::chrono::system_clock::duration d = std::chrono::system_clock::now().time_since_epoch();
+        std::chrono::nanoseconds nan = std::chrono::duration_cast<std::chrono::nanoseconds>(d);
+        stamp = nan.count() / 1000000000.0;
         short* pValue;
         if (SafeArrayAccessData(pSafeArray, (LPVOID*)&pValue) == S_OK)
         {
@@ -49,6 +53,7 @@ long get_data(int ch, int num, int rate, short *data)
                 *(data + sample) = *pValue;
             }
         }
+
     }
     return sampleNum;
 }
